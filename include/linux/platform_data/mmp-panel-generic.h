@@ -100,6 +100,16 @@ struct lcd {
 	struct mmp_dsi_cmds disable_cmds;
 	struct mmp_dsi_cmds backlight_on_cmds;
 	struct mmp_dsi_cmds backlight_set_brightness_cmds;
+	/*
+	 * Optional: patch a little-endian 32-bit value (intensity * mult) at
+	 * byte offset backlight_value_off of the first set-brightness command
+	 * instead of the single byte at data[1] (e.g. Quicklogic VX5B3D bridge
+	 * PWM duty register).  Offset 0 keeps the legacy behaviour.
+	 */
+	u32 backlight_value_off;
+	u32 backlight_value_mult;
+	/* Panel behind a DSI bridge: ID cannot be read, use DT id instead */
+	u32 fixed_panel_id;
 	/* temperature compensation */
 	struct temp_compensation *temp_comp;
 	unsigned int nr_temp_comp;

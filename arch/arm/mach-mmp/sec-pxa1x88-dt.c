@@ -727,6 +727,7 @@ static void __init pxa988_dt_init_machine(void)
 	|| of_machine_is_compatible("mrvl,pxa1L88-dkb-v10")
 	|| of_machine_is_compatible("mrvl,pxa1L88-dkb-v20")
 	|| of_machine_is_compatible("mrvl,pxa1L88-sec")
+	|| of_machine_is_compatible("mrvl,pxa986-sec")
 	|| of_machine_is_compatible("mrvl,pxa1088-sec")) {
 		pr_info("UDC only is enabled\n");
 		mmpx_usb_pdata.mode = MV_USB_MODE_UDC;
@@ -1051,6 +1052,7 @@ static const char *pxa1x88_dt_board_compat[] __initdata = {
 	"mrvl,pxa1L88-dkb",
 	"mrvl,pxa1L88-sec",
 	"mrvl,pxa1088-sec",
+	"mrvl,pxa986-sec",
 	NULL,
 };
 

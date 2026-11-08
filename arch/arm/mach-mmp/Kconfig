@@ -126,6 +126,15 @@ config MACH_DEGAS
 	  Include support for Marvell MMP2 based platforms using
 	  the device tree.
 
+config MACH_GOYA
+	bool "Samsung's PXA986 GOYA (Galaxy Tab 3 Lite 7.0 SM-T110) board"
+	select CPU_PXA988
+	select PINCTRL
+	select PINCTRL_SINGLE
+	help
+	  Say 'Y' here if you want to support the Samsung PXA986-based
+	  GOYA (SM-T110, goyawifi) tablet using the device tree.
+
 config MACH_DEGAS_USA
 	bool "Samsung's PXA1088 DEGAS Development Board"
 	select CPU_PXA1088

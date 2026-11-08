@@ -1,0 +1,123 @@
+/*
+ * Goya 1024x600 LVDS panel behind a QuickLogic VX5B3D MIPI-DSI -> LVDS
+ * bridge.  The bridge is programmed through DSI generic long writes
+ * (DI 0x29, payload: 05 01 40 <addr lo> <addr hi> <32-bit LE value>), in
+ * the same order as vx5b3d_bridge_init()/vx5b3d_backlightReg_on() of the
+ * 3.4 kernel (48.05 MHz LVDS clock variant).
+ *
+ * Backlight is the bridge PWM: duty register 0x164 = (mapped brightness) * 8
+ * (PWM period register 0x160 = 0x7F8 is set up in the enable commands).
+ */
+&mmp_dsi_panel {
+	dsi_vx5b3d_lvds_wsvga: marvell,dsi-panel-vx5b3d-lvds-wsvga {
+		marvell,dsi-panel-manu = "SDC";
+		marvell,dsi-panel-name = "vx5b3d-lvds-wsvga";
+		/* The bridge cannot be read back; use this id unconditionally */
+		marvell,dsi-panel-id = <0x5B3D00>;
+		marvell,dsi-panel-fixed-id;
+		marvell,dsi-panel-type = "video_mode";
+		marvell,dsi-panel-xres = <1024>;
+		marvell,dsi-panel-yres = <600>;
+		marvell,dsi-panel-width = <154>;
+		marvell,dsi-panel-height = <90>;
+		marvell,dsi-h-front-porch = <123>;
+		marvell,dsi-h-back-porch = <100>;
+		marvell,dsi-h-sync-width = <120>;
+		marvell,dsi-v-front-porch = <13>;
+		marvell,dsi-v-back-porch = <10>;
+		marvell,dsi-v-sync-width = <10>;
+		marvell,dsi-hsync-invert = <0>;
+		marvell,dsi-vsync-invert = <0>;
+		marvell,dsi-lanes = <4>;
+		marvell,dsi-burst-mode = <1>;	/* sync event */
+		marvell,dsi-master-mode;
+		marvell,dsi-hbp-en;
+
+		marvell,dsi-panel-init-cmds = [
+				29 00 00 00 09 05 01 40 00 07 40 00 90 6C
+				29 00 00 00 09 05 01 40 04 07 0A 04 03 00
+				29 00 00 00 09 05 01 40 0C 07 04 46 00 00
+				29 00 00 00 09 05 01 40 10 07 0B 00 4D 05
+				29 00 00 00 09 05 01 40 14 07 20 00 00 00
+				29 00 00 00 09 05 01 40 18 07 02 01 00 00
+				29 00 00 00 09 05 01 40 1C 07 2F 00 A8 00
+				29 00 00 00 09 05 01 40 20 07 00 00 00 00
+				29 00 00 00 09 05 01 40 54 01 00 00 00 00
+				29 00 01 00 09 05 01 40 54 01 00 00 00 80
+				29 00 00 00 09 05 01 40 00 07 40 08 90 6C
+				29 00 00 00 09 05 01 40 0C 07 56 5E 00 00
+				29 00 00 00 09 05 01 40 18 07 02 02 00 00
+				29 00 00 00 09 05 01 40 54 01 00 00 00 00
+				29 00 01 00 09 05 01 40 54 01 00 00 00 80
+				29 00 00 00 09 05 01 40 7C 03 63 10 00 00
+				29 00 00 00 09 05 01 40 80 03 30 60 A8 82
+				29 00 00 00 09 05 01 40 84 03 8B 40 61 28
+				29 00 00 00 09 05 01 40 88 03 85 02 13 00
+				29 00 00 00 09 05 01 40 8C 03 09 00 63 10
+				29 00 00 00 09 05 01 40 94 03 A8 82 0B 40
+				29 00 00 00 09 05 01 40 00 06 8C C7 6C 01
+				29 00 00 00 09 05 01 40 04 06 FF FF FF 3F
+				29 00 00 00 09 05 01 40 08 06 8C 0D 00 00
+				29 00 00 00 09 05 01 40 54 01 00 00 00 00
+				29 00 00 00 09 05 01 40 54 01 00 00 00 80
+				29 00 00 00 09 05 01 40 20 01 05 00 00 00
+				29 00 00 00 09 05 01 40 24 01 00 C4 92 18
+				29 00 00 00 09 05 01 40 28 01 06 28 10 00
+				29 00 00 00 09 05 01 40 2C 01 62 00 00 00
+				29 00 00 00 09 05 01 40 30 01 18 3C 00 00
+				29 00 00 00 09 05 01 40 34 01 15 00 00 00
+				29 00 00 00 09 05 01 40 38 01 00 80 FF 00
+				29 00 00 00 09 05 01 40 3C 01 00 00 00 00
+				29 00 00 00 09 05 01 40 14 01 02 63 0C 00
+				29 00 00 00 09 05 01 40 40 01 00 00 01 00
+				29 00 00 00 09 05 01 40 74 01 00 00 00 00
+				29 00 00 00 09 05 01 40 04 04 22 08 55 55
+				29 00 00 00 09 05 01 40 18 04 FF 02 55 55
+				29 00 00 00 09 05 01 40 10 04 00 03 E5 05
+				29 00 00 00 09 05 01 40 0C 02 24 01 00 00
+				29 00 00 00 09 05 01 40 1C 02 00 00 00 00
+				29 00 00 00 09 05 01 40 24 02 07 00 00 00
+				29 00 00 00 09 05 01 40 28 02 01 00 05 00
+				29 00 00 00 09 05 01 40 2C 02 03 FF 00 00
+				29 00 00 00 09 05 01 40 30 02 01 00 00 00
+				29 00 00 00 09 05 01 40 34 02 10 3E 03 CA
+				29 00 00 00 09 05 01 40 38 02 60 00 00 00
+				29 00 00 00 09 05 01 40 3C 02 30 60 E8 82
+				29 00 00 00 09 05 01 40 44 02 85 02 1E 00
+				29 00 00 00 09 05 01 40 58 02 62 00 06 00
+				29 00 00 00 09 05 01 40 00 04 00 00 00 00
+				29 00 00 00 09 05 01 40 58 01 00 00 00 00
+				29 00 0A 00 09 05 01 40 58 01 01 00 00 00
+		];
+		marvell,dsi-panel-init-cmds-txmode = "dsi-lp-mode";
+
+		marvell,dsi-panel-enable-cmds = [
+				29 00 00 00 09 05 01 40 60 01 F8 07 00 00
+				29 00 6E 00 09 05 01 40 04 06 E0 FF FF 3F
+				29 00 00 00 09 05 01 40 38 01 00 00 FF 3F
+				29 00 00 00 09 05 01 40 5C 01 05 00 00 00
+		];
+		marvell,dsi-panel-enable-cmds-txmode = "dsi-lp-mode";
+
+		marvell,dsi-panel-disable-cmds = [
+				29 00 00 00 09 05 01 40 64 01 00 00 00 00
+				29 00 64 00 09 05 01 40 5C 01 00 00 00 00
+				29 00 1E 00 09 05 01 40 04 06 FF FF FF 3F
+		];
+		marvell,dsi-panel-disable-cmds-txmode = "dsi-lp-mode";
+
+		marvell,dsi-panel-backlight-on-cmds = [
+				29 00 00 00 09 05 01 40 5C 01 05 00 00 00
+		];
+		marvell,dsi-panel-backlight-on-cmds-txmode = "dsi-lp-mode";
+		marvell,dsi-panel-backlight-set-brightness-cmds = [
+				29 00 00 00 09 05 01 40 64 01 00 00 00 00
+		];
+		marvell,dsi-panel-backlight-set-brightness-cmds-txmode = "dsi-lp-mode";
+		/* patch the 32-bit duty value at payload byte 5 */
+		marvell,dsi-panel-backlight-value-offset = <5>;
+		marvell,dsi-panel-backlight-value-mult = <8>;
+
+		marvell,dsi-panel-read-id-regs = [00 00 00];
+	};
+};

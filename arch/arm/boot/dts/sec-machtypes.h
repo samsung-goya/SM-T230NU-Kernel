@@ -20,6 +20,8 @@
 #define MACH_TYPE_KAVERILTE 3906
 #define MACH_TYPE_MOUTAILTE 3907
 #define MACH_TYPE_AJANTALTE 3908
+/* Goya shares 3908 with AJANTALTE; they are never built into one boot image */
+#define MACH_TYPE_GOYAWIFI  3908
 #define MACH_TYPE_DEGAS3G   3909
 #define MACH_TYPE_AGERALTE  3910
 #define MACH_TYPE_DEGASWIFI  3911

@@ -25,10 +25,15 @@
 #include <linux/battery/fuelgauge/88pm80x_table_degas.h>
 #elif defined(CONFIG_MACH_AGERA)
 #include <linux/battery/fuelgauge/88pm80x_table_agera.h>
+#elif defined(CONFIG_MACH_GOYA)
+#include <linux/battery/fuelgauge/88pm80x_table_goya.h>
 #else
 #include <linux/battery/fuelgauge/88pm80x_table.h>  //use default one
 #endif
 #include <linux/battery/sec_fuelgauge.h>
+
+/* set on resume so the first capacity update after suspend may jump down */
+static bool resume_flag;
 
 static int pm80x_battery_suspend(struct sec_fg_info *info);
 static int pm80x_battery_resume(struct sec_fg_info *info);

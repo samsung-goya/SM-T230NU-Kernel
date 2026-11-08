@@ -194,6 +194,9 @@ static u32 set_panel_id(struct mmp_panel *panel)
 	struct mmp_dsi_buf *dbuf;
 	struct lcd *lcd = panel->plat_data;
 
+	if (lcd->fixed_panel_id)
+		return lcd->fixed_panel_id;
+
 	mutex_lock(&lcd->access_ok);
 	dbuf = kzalloc(sizeof(struct mmp_dsi_buf), GFP_KERNEL);
 	if (dbuf) {
@@ -349,7 +352,17 @@ static int mmp_dsi_panel_set_brightness(struct mmp_panel *panel, int intensity)
 	}
 
 	if (IS_ENABLED(CONFIG_OF) && lcd->backlight_on_cmds.nr_cmds) {
-		lcd->backlight_set_brightness_cmds.cmds[0].data[1] = intensity;
+		if (lcd->backlight_value_off) {
+			u8 *d = lcd->backlight_set_brightness_cmds.cmds[0].data;
+			u32 v = intensity * (lcd->backlight_value_mult ?
+					     lcd->backlight_value_mult : 1);
+			int i;
+
+			for (i = 0; i < 4; i++)
+				d[lcd->backlight_value_off + i] = (v >> (8 * i)) & 0xff;
+		} else {
+			lcd->backlight_set_brightness_cmds.cmds[0].data[1] = intensity;
+		}
 		mmp_phy_dsi_tx_cmd_array(path->phy,
 				lcd->backlight_set_brightness_cmds.cmds,
 				lcd->backlight_set_brightness_cmds.nr_cmds);
@@ -1254,7 +1267,14 @@ static int mmp_dsi_panel_parse_dt_panel(
 	mmp_dsi_parse_dt_dcs_cmds(np,
 			"marvell,dsi-panel-backlight-set-brightness-cmds",
 			&lcd->backlight_set_brightness_cmds);
+	of_property_read_u32(np, "marvell,dsi-panel-backlight-value-offset",
+			&lcd->backlight_value_off);
+	of_property_read_u32(np, "marvell,dsi-panel-backlight-value-mult",
+			&lcd->backlight_value_mult);
 #endif
+	if (of_property_read_bool(np, "marvell,dsi-panel-fixed-id"))
+		of_property_read_u32(np, "marvell,dsi-panel-id",
+				&lcd->fixed_panel_id);
 
 	addr = of_get_property(np, "marvell,dsi-panel-read-id-regs", &sz);
 	if (unlikely(!addr)) {

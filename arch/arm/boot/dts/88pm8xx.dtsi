@@ -68,14 +68,14 @@
 				regulator-max-microvolt = <3300000>;
 				regulator-boot-on;
 			};
-			LDO2 {
+			ldo2: LDO2 {
 				regulator-compatible = "88PM800-LDO2";
 				regulator-min-microvolt = <1700000>;
 				regulator-max-microvolt = <3300000>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
-			LDO3 {
+			ldo3: LDO3 {
 				regulator-compatible = "88PM800-LDO3";
 				regulator-min-microvolt = <1200000>;
 				regulator-max-microvolt = <3300000>;
