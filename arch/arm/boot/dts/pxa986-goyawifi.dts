@@ -962,7 +962,7 @@
 				i2c-gpio = <&gpio 87 0 &gpio 88 0>;
 				marvell,i2c-always-on;
 				status = "okay";
-				tsp@20 {
+				bt532_tsp: tsp@20 {
 					compatible = "zinitix,bt532_tsp";
 					pinctrl-names = "default";
 					pinctrl-0 = <&tsp_gpio_func &tsp_vendor_func>;

@@ -1183,6 +1183,18 @@ void sw_poweroff(void)
 	pr_err("turning off power failes!\n");
 }
 
+/*
+ * CONFIG_RECOVERY_KERNEL: custom recoveries (TWRP) are not started through the
+ * stock recovery flag, so get_recoverymode() is 0 there and a plain reboot
+ * would write BOOT_BY_INTENDED_RESET and land in recovery again. A recovery
+ * kernel always writes RECOVERY_DONE on a plain reboot instead.
+ */
+#ifdef CONFIG_RECOVERY_KERNEL
+#define pm80x_reboot_to_recovery_done()	1
+#else
+#define pm80x_reboot_to_recovery_done()	(get_recoverymode() == 1)
+#endif
+
 static int reboot_notifier_func(struct notifier_block *this,
 		unsigned long code, void *p)
 {
@@ -1245,7 +1257,7 @@ static int reboot_notifier_func(struct notifier_block *this,
 			regmap_write(chip->regmap, PMIC_GENERAL_USE_REGISTER,
 									data);
 		} else {
-			if (get_recoverymode() == 1) {
+			if (pm80x_reboot_to_recovery_done()) {
 				pr_info("reset noti recovery mode\n");
 				data |= PMIC_GENERAL_USE_BOOT_BY_RECOVERY_DONE;
 				regmap_write(chip->regmap,
@@ -1258,7 +1270,7 @@ static int reboot_notifier_func(struct notifier_block *this,
 			}
 		}
 	} else {
-		if (get_recoverymode() == 1) {
+		if (pm80x_reboot_to_recovery_done()) {
 			pr_info("reset noti recovery p = null\n");
 			data |= PMIC_GENERAL_USE_BOOT_BY_RECOVERY_DONE;
 			regmap_write(chip->regmap, PMIC_GENERAL_USE_REGISTER,

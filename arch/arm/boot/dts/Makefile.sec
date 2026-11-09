@@ -26,7 +26,7 @@ dtb-$(CONFIG_MACH_DEGAS) += pxa1088-degas3g-r00.dtb   \
 			     pxa1088-degaswifiusa-r01.dtb   \
 			     pxa1088-degaswifiusa-r02.dtb   \
 			     pxa1088-degaswifiusa-r03.dtb
-dtb-$(CONFIG_MACH_GOYA) += pxa986-goyawifi.dtb
+dtb-$(CONFIG_MACH_GOYA) += pxa986-goyawifi.dtb pxa986-goyawifi-recovery.dtb
 dtb-$(CONFIG_MACH_AGERA) += pxa1l88-ageralte-r00.dtb  \
 			     pxa1l88-ageralte-r01.dtb  \
 			     pxa1l88-ageralte-r02.dtb  \

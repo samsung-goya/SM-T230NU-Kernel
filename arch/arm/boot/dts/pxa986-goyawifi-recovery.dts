@@ -1,0 +1,11 @@
+/*
+ * Samsung GOYA (SM-T110) - custom recovery (TWRP) variant.
+ *
+ * TWRP runs in landscape, so rotate the BT532 touch panel (orientation 6,
+ * the value the 3.4 TWRP defconfig uses) instead of the portrait default.
+ */
+#include "pxa986-goyawifi.dts"
+
+&bt532_tsp {
+	bt532,orientation = /bits/ 8 <6>;
+};

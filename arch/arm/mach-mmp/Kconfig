@@ -135,6 +135,14 @@ config MACH_GOYA
 	  Say 'Y' here if you want to support the Samsung PXA986-based
 	  GOYA (SM-T110, goyawifi) tablet using the device tree.
 
+config RECOVERY_KERNEL
+	bool "reset reboot-recovery flag on each reboot"
+	depends on MACH_GOYA
+	help
+	  Build a kernel that, by default, resets the reboot-recovery flag
+	  on a plain reboot and prevents getting stuck in recovery (useful
+	  for custom recoveries such as TWRP).
+
 config MACH_DEGAS_USA
 	bool "Samsung's PXA1088 DEGAS Development Board"
 	select CPU_PXA1088
