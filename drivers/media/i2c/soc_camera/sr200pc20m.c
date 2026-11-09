@@ -247,7 +247,7 @@ to_retry:
  * Returns 0 on success, <0 on error
  */
 
-extern camera_antibanding_val; /*default : CAM_BANDFILTER_50HZ = 2*/
+static int camera_antibanding_val = 2; /* default: CAM_BANDFILTER_50HZ = 2; 3.4 sets it via a board sysfs node */
 
 int camera_antibanding_get (void) {
 		return camera_antibanding_val;
