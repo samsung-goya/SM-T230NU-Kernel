@@ -928,7 +928,7 @@
 				};
 				gps_pmx_poweronoff: gps_pmx_poweronoff {
 					pinctrl-single,pins = <
-						GPIO4 AF0
+						GPIO52 AF0
 					>;
 					MFP_PULL_DOWN;MFP_LPM_DIRVE_LOW;
 				};
@@ -1401,7 +1401,7 @@
 		pinctrl-0 = <&gps_pmx_eclk &gps_pmx_poweronoff &gps_pmx_reset>;
 		pinctrl-1 = <&gps_pmx_gpio>;
 
-		on-off-gpio = <&gpio 4 0>;
+		on-off-gpio = <&gpio 52 0>;
 		reset-n-gpio = <&gpio 5 0>;
 	};
 	dip {
@@ -1439,7 +1439,7 @@
 		marvell,switch-name = "h2w";
 		marvell,headset-flag = <0>;
 		/* Should be checked value adc '4pole Min' between 'Button max' */
-		marvell,press-release-th = <950>;
+		marvell,press-release-th = <320>;
 		marvell,micbias-supply = <&ldo14>;
 
 		marvell,hook-press-th = <70>;
@@ -1464,7 +1464,7 @@
 		/* 0 < adc <= 980, unstable zone, default to 3pole if it stays
 		 * in this range for a 100ms (20ms delays, 5 samples)
 		 */
-		sec1,adc_high = <1001>;
+		sec1,adc_high = <341>;
 		sec1,delay_ms = <20>;
 		sec1,check_count = <5>;
 		sec1,jack_type = <2>; /* SEC_HEADSET_3POLE */
@@ -1472,17 +1472,17 @@
 		/* 980 < adc <= 1000, unstable zone, default to 4pole if it
 		 * stays in this range for 200ms (20ms delays, 10 samples)
 		 */
-		sec2,adc_high = <1002>;
+		sec2,adc_high = <1000>;
 		sec2,delay_ms = <20>;
-		sec2,check_count = <10>;
+		sec2,check_count = <2>;
 		sec2,jack_type = <1>; /* SEC_HEADSET_4POLE */
 
 		/* 1000 < adc <= 1399, default to 4 pole if it stays */
 		/* in this range for 40ms (20ms delays, 2 samples)
 		 */
-		sec3,adc_high = <1700>;
+		sec3,adc_high = <1399>;
 		sec3,delay_ms = <20>;
-		sec3,check_count = <2>;
+		sec3,check_count = <5>;
 		sec3,jack_type = <1>; /* SEC_HEADSET_4POLE */
 
 		/* adc > 1400, unstable zone, default to 3pole if it stays
@@ -1490,24 +1490,24 @@
 		 */
 		sec4,adc_high = <0x7fffffff>;
 		sec4,delay_ms = <10>;
-		sec4,check_count = <1000>;
+		sec4,check_count = <100>;
 		sec4,jack_type = <2>; /* SEC_HEADSET_3POLE */
 
 		/* to support 3-buttons earjack */
 		/* 0 <= adc <=160, stable zone */
 		sec_sendend0,code = <0x4000>; /* SND_JACK_BTN_0 */
 		sec_sendend0,adc_low =<0>;
-		sec_sendend0,adc_high =<170>;
+		sec_sendend0,adc_high =<60>;
 
 		/* 161 <= adc <= 300, stable zone */
 		sec_sendend1,code = <0x2000>; /* SND_JACK_BTN_1 */
-		sec_sendend1,adc_low =<171>;
-		sec_sendend1,adc_high =<344>;
+		sec_sendend1,adc_low =<61>;
+		sec_sendend1,adc_high =<120>;
 
 		/* 321 <= adc <= 700, stable zone */
 		sec_sendend2,code = <0x1000>; /* SND_JACK_BTN_2 */
-		sec_sendend2,adc_low =<345>;
-		sec_sendend2,adc_high =<900>;
+		sec_sendend2,adc_low =<121>;
+		sec_sendend2,adc_high =<280>;
 	};
 };
 
