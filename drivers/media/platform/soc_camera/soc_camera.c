@@ -1764,11 +1764,16 @@ static int soc_camera_video_start(struct soc_camera_device *icd)
 	if (!icd->parent)
 		return -ENODEV;
 
+	/* main (rear) sensor is /dev/video0, any other sensor (e.g. the
+	 * goya SR200PC20M) is /dev/video1 */
+	if (false
 #ifdef CONFIG_SOC_CAMERA_S5K4ECGX
-	if (!strcmp(client->name, "s5k4ecgx"))
-#elif defined(CONFIG_SOC_CAMERA_SR352)		
-	if (!strcmp(client->name, "sr352"))
+	    || !strcmp(client->name, "s5k4ecgx")
 #endif
+#ifdef CONFIG_SOC_CAMERA_SR352
+	    || !strcmp(client->name, "sr352")
+#endif
+	    )
 		nr = 0;
 	else
 		nr = 1;
