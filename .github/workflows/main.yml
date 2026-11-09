@@ -1,0 +1,34 @@
+name: Kernel CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout Kernel Source
+      uses: actions/checkout@v7
+
+    - name: Getting Toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install lib32z1 ccache
+        sudo git clone --depth 1 --branch android-4.4.4_r2.0.1 --single-branch https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-eabi-4.7 /opt/toolchains/arm-eabi-4.7/
+    - name: Building Kernel
+      run: |
+        export ARCH=arm
+        export CROSS_COMPILE=/opt/toolchains/arm-eabi-4.7/bin/arm-eabi-
+        sed -i 's/^YYLTYPE yylloc;/extern YYLTYPE yylloc;/' scripts/dtc/dtc-lexer.lex.c_shipped
+        make -j2 pxa986_goyawifi_recovery_defconfig
+        make -j$(nproc --all)
+    - name: Moving Output # CI only
+      run: |
+        mkdir -p /home/runner/work/output
+        cp arch/arm/boot/zImage /home/runner/work/output/zImage
+    - name: Uploading zImage
+      uses: actions/upload-artifact@v6
+      with:
+        name: zImage
+        path: /home/runner/work/output/zImage
