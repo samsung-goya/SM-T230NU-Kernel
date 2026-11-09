@@ -27,6 +27,8 @@ jobs:
       run: |
         mkdir -p /home/runner/work/output
         cp arch/arm/boot/zImage /home/runner/work/output/zImage
+        cp arch/arm/boot/zImage-dtb /home/runner/work/output/zImage-dtb
+        cp arch/arm/boot/dts/pxa986-goyawifi.dtb /home/runner/work/output/
     - name: Uploading zImage
       uses: actions/upload-artifact@v6
       with:
