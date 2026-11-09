@@ -34,3 +34,8 @@ jobs:
       with:
         name: zImage
         path: /home/runner/work/output/zImage
+    - name: Uploading zImage-dtb
+      uses: actions/upload-artifact@v6
+      with:
+        name: zImage-dtb
+        path: /home/runner/work/output/zImage-dtb
