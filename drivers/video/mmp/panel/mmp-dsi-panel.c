@@ -40,6 +40,7 @@
 #include <linux/platform_data/mmp-panel-mdnie.h>
 #include <linux/platform_data/mmp-panel-backlight.h>
 #include <linux/power_supply.h>
+#include <linux/platform_data/quicklogic-vx.h>
 
 static u32 boot_panel_id;
 static struct mmp_panel mmp_dsi_panel;
@@ -337,6 +338,30 @@ static int mmp_dsi_panel_disable(struct mmp_path *path)
 }
 
 #ifdef CONFIG_MMP_PANEL_BACKLIGHT
+/*
+ * Bridge CSR writes (DI 0x29, payload 05 01 40 <addr lo> <addr hi>
+ * <32-bit value>) can go over the bridge's I2C port instead of DSI, as
+ * the 3.4 kernel does at run time.  Returns 0 when all were sent that way.
+ */
+static int mmp_dsi_bridge_i2c_tx(struct mmp_dsi_cmds *cmds)
+{
+	int i, ret = 0;
+
+	for (i = 0; i < cmds->nr_cmds; i++) {
+		u8 *d = cmds->cmds[i].data;
+
+		if (cmds->cmds[i].length < 9 || d[0] != 0x05 || d[1] != 0x01 ||
+		    d[2] != 0x40)
+			return -EINVAL;
+		ret = quicklogic_vx_write32(d[3] | (d[4] << 8),
+				d[5] | (d[6] << 8) | (d[7] << 16) |
+				((u32)d[8] << 24));
+		if (ret)
+			return ret;
+	}
+	return 0;
+}
+
 static int mmp_dsi_panel_set_brightness(struct mmp_panel *panel, int intensity)
 {
 	struct lcd *lcd = panel->plat_data;
@@ -363,6 +388,10 @@ static int mmp_dsi_panel_set_brightness(struct mmp_panel *panel, int intensity)
 		} else {
 			lcd->backlight_set_brightness_cmds.cmds[0].data[1] = intensity;
 		}
+		if (lcd->backlight_value_off &&
+		    !mmp_dsi_bridge_i2c_tx(&lcd->backlight_set_brightness_cmds) &&
+		    !mmp_dsi_bridge_i2c_tx(&lcd->backlight_on_cmds))
+			goto out;
 		mmp_phy_dsi_tx_cmd_array(path->phy,
 				lcd->backlight_set_brightness_cmds.cmds,
 				lcd->backlight_set_brightness_cmds.nr_cmds);
@@ -370,6 +399,7 @@ static int mmp_dsi_panel_set_brightness(struct mmp_panel *panel, int intensity)
 				lcd->backlight_on_cmds.cmds,
 				lcd->backlight_on_cmds.nr_cmds);
 	}
+out:
 	mutex_unlock(&lcd->access_ok);
 
 	return intensity;

@@ -563,6 +563,15 @@ config MMP_GPS
          Creates an entry in sysfs for Marvell GPS chips to control
 	 power/clock, enable/disable.
 
+config QUICKLOGIC_BRIDGE
+	bool "QuickLogic VX5B3D DSI-to-LVDS bridge I2C control port"
+	depends on I2C
+	default n
+	help
+	  Control port of the QuickLogic MIPI-DSI to LVDS bridge used on
+	  Galaxy Tab 3 Lite (goya).  Used for backlight/enable writes while
+	  the DSI link is streaming.
+
 source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/eeprom/Kconfig"
 source "drivers/misc/cb710/Kconfig"

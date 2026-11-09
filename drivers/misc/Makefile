@@ -58,3 +58,4 @@ obj-$(CONFIG_SD8XXX_RFKILL)	+= sd8x_rfkill.o
 obj-y				+= sec-debug/
 obj-$(CONFIG_MRVL_REGS_ADDR)	+= regs-addr.o
 obj-$(CONFIG_MMP_GPS)		+= mmp_gps.o
+obj-$(CONFIG_QUICKLOGIC_BRIDGE)	+= quicklogic-vx.o

@@ -979,6 +979,11 @@
 					tsp_vendor_1 = <&gpio 61 GPIO_ACTIVE_LOW>;
 					tsp_vendor_2 = <&gpio 60 GPIO_ACTIVE_LOW>;
 				};
+				/* VX5B3D DSI-to-LVDS bridge control port */
+				quickbridge@64 {
+					compatible = "quicklogic,vx5b3d";
+					reg = <0x64>;
+				};
 			};
 
 			twsi2: i2c@d4037000 {
