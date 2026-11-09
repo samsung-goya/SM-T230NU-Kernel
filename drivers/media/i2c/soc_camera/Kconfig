@@ -96,6 +96,12 @@ config SOC_CAMERA_SR352
 	depends on SOC_CAMERA && I2C
 	help
 	  This is a V4L2 camera driver for the sr352 sensor
+config SOC_CAMERA_SR200PC20M
+	tristate "SR200PC20M camera support"
+	depends on SOC_CAMERA && I2C
+	help
+	  This is a V4L2 camera driver for the sr200pc20m sensor
+	  (Galaxy Tab 3 Lite 7.0 / goya back camera)
 config SOC_CAMERA_SR130PC10
 	tristate "SR130PC10 camera support"
 	depends on SOC_CAMERA && I2C

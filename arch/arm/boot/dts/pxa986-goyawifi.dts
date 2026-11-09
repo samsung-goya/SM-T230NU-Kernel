@@ -128,13 +128,11 @@
 				status = "okay";
 			};
 			ccic1: ccic@d420a000 {
-				cam_avdd-supply = <&ldo3>;
-				cam_io-supply = <&ldo2>;
-				cam_core-supply = <&buck5>;
+				/* SR200PC20M: rails are GPIO switches on goya */
+				cam_io = <&gpio 79 0>;
+				cam_avdd = <&gpio 80 0>;
 				cam_stby = <&gpio 14 0>;
 				cam_rst = <&gpio 15 0>;
-				vt_cam_stby = <&gpio 82 0>;
-				vt_cam_rst = <&gpio 81 0>;
 				pinctrl-names = "default","enable";
 				pinctrl-0 = <&cam_pmx_gpio &cam_pmx_func2 &cam_pmx_func3 &cam_pmx_func4 &cam_pmx_func5>;
 				pinctrl-1 = <&cam_pmx_func1 &cam_pmx_func2 &cam_pmx_func3 &cam_pmx_func4 &cam_pmx_func5>;
@@ -338,6 +336,16 @@
 			};
 
 
+			/* same TMU as PXA988 (3.4 pxa988_thermal.c): base d4013200, DRO_SENSOR irq 60 */
+			thermal: thermal@d4013200 {
+				compatible = "marvell,pxa1088-thermal";
+				reg = <0xd4013200 0x50>;
+				interrupts = <0 60 0x4>;
+				trigger_levels_count = <0>;
+				type = <0>;
+				status = "ok";
+			};
+
 			watchdog: watchdog@d4080000 {
 				status = "okay";
 			};
@@ -462,8 +470,8 @@
 
 				cam_pmx_func5: cam_pmx_func5 {
 					pinctrl-single,pins = <
-						GPIO81 AF0
-						GPIO82 AF0
+						GPIO79 AF0
+						GPIO80 AF0
 					>;
 					DS_MEDIUM;PULL_DOWN;EDGE_NONE;LPM_DRIVE_LOW;
 				};
@@ -778,17 +786,18 @@
 					DS_MEDIUM;PULL_NONE;EDGE_NONE;LPM_DRIVE_HIGH;
 				};
 
+				/* camera sensor i2c (CAM_SCL/CAM_SDA) */
 				twsi0_pmx_func: twsi0_pmx_func {
 					pinctrl-single,pins = <
-						GPIO79 AF1
-						GPIO80 AF1
+						GPIO53 AF2
+						GPIO54 AF2
 					>;
 					MFP_LPM_FLOAT;
 				};
 				twsi0_pmx_gpio: twsi0_pmx_gpio {
 					pinctrl-single,pins = <
-						GPIO79 AF0
-						GPIO80 AF0
+						GPIO53 AF0
+						GPIO54 AF0
 					>;
 					MFP_LPM_FLOAT;
 				};
@@ -941,7 +950,7 @@
 				pinctrl-names = "default","gpio";
 				pinctrl-0 = <&twsi0_pmx_func>;
 				pinctrl-1 = <&twsi0_pmx_gpio>;
-				i2c-gpio = <&gpio 79 0 &gpio 80 0>;
+				i2c-gpio = <&gpio 53 0 &gpio 54 0>;
 				marvell,i2c-always-on;
 				status = "okay";
 			};
@@ -1021,8 +1030,9 @@
 		soc-camera@0 {
 			 status = "okay";
 		};
+		/* front "subsensor" camera: driver not ported */
 		soc-camera@1 {
-			status = "okay";
+			status = "disabled";
 		};
 
 		/*

@@ -68,8 +68,8 @@
 
 	pmu {
 		compatible = "arm,cortex-a9-pmu";
-		interrupts = <0 56 0x4>,
-			     <0 57 0x4>;
+		interrupts = <0 58 0x4>,
+			     <0 61 0x4>;
 	};
 
 	clock: clock-controller {

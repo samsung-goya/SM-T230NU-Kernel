@@ -596,6 +596,93 @@ static struct soc_camera_desc secondary_desc = {
 	},
 };
 #endif
+#ifdef CONFIG_SOC_CAMERA_SR200PC20M
+/*
+ * Galaxy Tab 3 Lite 7.0 (goya) back camera.  Unlike the PXA1088 boards its
+ * 1.8V I/O and 2.8V AVDD rails are plain GPIO controlled switches
+ * (see samsung_camera_goya.c in the 3.4 goya kernel).
+ */
+static int sr200pc20m_sensor_power(struct device *dev, int on)
+{
+	struct soc_camera_host *ici = to_soc_camera_host(dev);
+	struct mmp_camera_dev *pcdev = ici->priv;
+	static int gpio_status_sr200pc20m;
+	static int cam_stby, cam_rst, cam_io, cam_avdd;
+	int ret = 0;
+
+	if (!gpio_status_sr200pc20m) {
+		cam_stby = of_get_named_gpio(np, "cam_stby", 0);
+		cam_rst = of_get_named_gpio(np, "cam_rst", 0);
+		cam_io = of_get_named_gpio(np, "cam_io", 0);
+		cam_avdd = of_get_named_gpio(np, "cam_avdd", 0);
+		if (cam_stby < 0 || cam_rst < 0 || cam_io < 0 || cam_avdd < 0) {
+			pr_err("%s: missing camera gpios in dt\n", __func__);
+			return -EINVAL;
+		}
+		ret = gpio_request(cam_stby, "cam_stby");
+		ret |= gpio_request(cam_rst, "cam_rst");
+		ret |= gpio_request(cam_io, "cam_io");
+		ret |= gpio_request(cam_avdd, "cam_avdd");
+		if (ret)
+			pr_err("%s: gpio_request failed: %d\n", __func__, ret);
+		gpio_status_sr200pc20m = 1;
+	}
+
+	if (on) {
+		pr_info("---sr200pc20m camera power ON ----------\n");
+		/* Sensor IO & core: 1.8V ON */
+		gpio_direction_output(cam_io, 1);
+		/* Sensor AVDD: 2.8V ON */
+		gpio_direction_output(cam_avdd, 1);
+		msleep(5);
+		/* STBY enable */
+		gpio_direction_output(cam_stby, 1);
+		msleep(1);
+		/* MCLK on */
+		ccic_enable_clk(pcdev);
+		msleep(40);
+		/* reset pulse */
+		gpio_direction_output(cam_rst, 0);
+		msleep(2);
+		gpio_direction_output(cam_rst, 1);
+		msleep(5);
+	} else {
+		pr_info("---sr200pc20m camera power OFF ----------\n");
+		msleep(1);
+		gpio_direction_output(cam_rst, 0);
+		msleep(1);
+		/* MCLK off */
+		ccic_disable_clk(pcdev);
+		msleep(5);
+		gpio_direction_output(cam_stby, 0);
+		gpio_direction_output(cam_avdd, 0);
+		gpio_direction_output(cam_io, 0);
+	}
+	return ret;
+}
+static struct sensor_board_data sr200pc20m_data = {
+	.mount_pos	= SENSOR_USED | SENSOR_POS_BACK | SENSOR_RES_HIGH,
+	.bus_type	= V4L2_MBUS_CSI2,
+	.bus_flag	= V4L2_MBUS_CSI2_1_LANE,
+	.dphy = {0x0b05, 0x11, 0x0900},
+};
+static struct i2c_board_info dkb_i2c_sr200pc20m = {
+		I2C_BOARD_INFO("sr200pc20m", (0x40 >> 1)),
+};
+static struct soc_camera_desc sr200pc20m_desc = {
+	.subdev_desc = {
+		.power          = sr200pc20m_sensor_power,
+		.drv_priv		= &sr200pc20m_data,
+		.flags		= 0,
+	},
+	.host_desc = {
+		.bus_id = 0,	/* Must match with the camera ID */
+		.i2c_adapter_id = 0,
+		.board_info     = &dkb_i2c_sr200pc20m,
+		.module_name    = "sr200pc20m",
+	},
+};
+#endif
 /* PXA988 */
 static const struct of_dev_auxdata pxa988_auxdata_lookup[] __initconst  = {
 	OF_DEV_AUXDATA("mrvl,mmp-uart", 0xd4036000, "pxa2xx-uart.0", NULL),
@@ -666,6 +753,10 @@ static const struct of_dev_auxdata pxa988_auxdata_lookup[] __initconst  = {
 #endif
 #if defined(CONFIG_SOC_CAMERA_S5K4ECGX) || defined(CONFIG_SOC_CAMERA_SR352)
 	OF_DEV_AUXDATA("soc-camera-pdrv", 0, "soc-camera-pdrv.0", &main_desc),
+#endif
+#if defined(CONFIG_SOC_CAMERA_SR200PC20M)
+	OF_DEV_AUXDATA("soc-camera-pdrv", 0, "soc-camera-pdrv.0",
+				&sr200pc20m_desc),
 #endif
 #if defined(CONFIG_SOC_CAMERA_SR130PC10)
 	OF_DEV_AUXDATA("soc-camera-pdrv", 1, "soc-camera-pdrv.1",

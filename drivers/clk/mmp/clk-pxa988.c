@@ -946,6 +946,55 @@ static struct cpu_opt pxa1x88_op_array[] = {
 	},
 };
 
+/*
+ * PXA986/PXA988 (dual Cortex-A9).  Operating points taken from the
+ * 3.4 goya kernel (acpuclock-pxa988.c, Z3/Ax PP table), without the 1205MHz
+ * PLL3P point: PLL3 master rate changes are not supported and there is no
+ * PMU-DVC backend for this SoC in this tree, so higher points can not be
+ * paired with the matching core voltage.
+ */
+static struct cpu_opt pxa988_op_array[] = {
+	{
+		.pclk = 312,
+		.l2clk = 312,
+		.pdclk = 156,
+		.baclk = 156,
+		.periphclk = 39,
+		.ap_clk_sel = AP_CLK_SRC_PLL1_624,
+	},
+	{
+		.pclk = 624,
+		.l2clk = 312,
+		.pdclk = 312,
+		.baclk = 156,
+		.periphclk = 78,
+		.ap_clk_sel = AP_CLK_SRC_PLL1_624,
+	},
+	/* pll2 vco is set by DDR, only one of 800/1066 can be valid */
+	{
+		.pclk = 800,
+		.l2clk = 400,
+		.pdclk = 400,
+		.baclk = 200,
+		.periphclk = 100,
+		.ap_clk_sel = AP_CLK_SRC_PLL2,
+	},
+	{
+		.pclk = 1066,
+		.l2clk = 533,
+		.pdclk = 533,
+		.baclk = 266,
+		.periphclk = 133,
+		.ap_clk_sel = AP_CLK_SRC_PLL2,
+	},
+};
+
+/* cache RTC/WTC, from the 3.4 "Ax" table (superset of Z3 below 1066MHz) */
+static struct cpu_rtcwtc cpu_rtcwtc_988[] = {
+	{.max_pclk = 800, .l1_rtc = 0x88888888, .l2_rtc = 0x00008444,},
+	{.max_pclk = 1066, .l1_rtc = 0x99999999, .l2_rtc = 0x00009555,},
+};
+
 struct core_params pxa1x88_core_params = {
 	.core_offset = &pxa988_reg_off,
 	.parent_table = parent_table,
@@ -1176,6 +1225,18 @@ void __init pxa988_acpu_init(void __iomem *apmu_base, void __iomem *mpmu_base,
 	if (cpu_is_pxa1L88()) {
 		ddr_clk_flag = MMP_DDR_HWDFC_FEAT;
 		hwdfc_flag = MMP_DDR_HWDFC_WR;
+	} else if (cpu_is_pxa988() || cpu_is_pxa986()) {
+		/*
+		 * Dual A9: own CPU PP table.  Without DVFS (no voltage scaling
+		 * for this SoC yet) stay at or below 800MHz.  DDR table index
+		 * is left at its default and the 1088 DLL bypass is not used.
+		 */
+		core_params->cpu_opt = pxa988_op_array;
+		core_params->cpu_opt_size = ARRAY_SIZE(pxa988_op_array);
+		core_params->cpu_rtcwtc_table = cpu_rtcwtc_988;
+		core_params->cpu_rtcwtc_table_size = ARRAY_SIZE(cpu_rtcwtc_988);
+		core_params->max_cpurate = 800;
+		ddr_clk_flag = 0;
 	} else {
 		/* For 1088, ddr reg table index is 1, 3, 5 */
 		for (i = 0; i < ARRAY_SIZE(lpddr533_oparray); i++)
