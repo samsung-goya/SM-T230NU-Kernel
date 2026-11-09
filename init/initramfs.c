@@ -421,6 +421,8 @@ static unsigned my_inptr;   /* index of next byte to be processed in inbuf */
 
 #include <linux/decompress/generic.h>
 
+static int __initdata archives_done;
+
 static char * __init unpack_to_rootfs(char *buf, unsigned len)
 {
 	int written, res;
@@ -438,8 +440,20 @@ static char * __init unpack_to_rootfs(char *buf, unsigned len)
 	state = Start;
 	this_header = 0;
 	message = NULL;
+	archives_done = 0;
 	while (!message && len) {
 		loff_t saved_offset = this_header;
+#ifdef CONFIG_MACH_GOYA
+		/*
+		 * goyawifi: the bootloader always passes a 16 MiB initrd span, and
+		 * whatever follows the ramdisk in that span is leftover data. Once a
+		 * complete archive has been unpacked, stop at the first byte that is
+		 * not padding instead of rejecting the whole image. This lets the
+		 * kernel boot ramdisks of any size (for example Magisk-patched ones).
+		 */
+		if (archives_done && *buf && state == Reset)
+			break;
+#endif
 		if (*buf == '0' && !(this_header & 3)) {
 			state = Start;
 			written = write_buffer(buf, len);
@@ -471,6 +485,8 @@ static char * __init unpack_to_rootfs(char *buf, unsigned len)
 			error("junk in compressed archive");
 		if (state != Reset)
 			error("junk in compressed archive");
+		else
+			archives_done++;
 		this_header = saved_offset + my_inptr;
 		buf += my_inptr;
 		len -= my_inptr;
