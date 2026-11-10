@@ -135,6 +135,16 @@ config MACH_GOYA
 	  Say 'Y' here if you want to support the Samsung PXA986-based
 	  GOYA (SM-T110, goyawifi) tablet using the device tree.
 
+config GOYA_DVFS
+	bool "Voltage/frequency scaling tables for PXA986 (goya)"
+	depends on MACH_GOYA
+	default n
+	help
+	  Register the PXA986/988 DVFS platform info (PM822 BUCK1 voltage
+	  levels backported from the 3.4 kernel). Untested on hardware, so it
+	  is off by default: without it the CPU runs at its boot voltage and
+	  the clock driver's 800 MHz cap.
+
 config RECOVERY_KERNEL
 	bool "reset reboot-recovery flag on each reboot"
 	depends on MACH_GOYA

@@ -469,7 +469,7 @@ CONFIG_ZBOOT_ROM_BSS=0x0
 CONFIG_ARM_APPENDED_DTB=y
 CONFIG_ARM_ATAG_DTB_COMPAT=y
 CONFIG_ARM_ATAG_DTB_COMPAT_CMDLINE_EXTEND=y
-CONFIG_CMDLINE="selinux=0 androidboot.selinux=disabled enforcing=0 goyawifi.initrd_size=1419841 goyawifi.lcd_init=1 console=ttyS1,115200"
+CONFIG_CMDLINE="selinux=0 androidboot.selinux=disabled enforcing=0 goyawifi.initrd_size=1419841 goyawifi.lcd_init=1 console=ttyS1,115200 initcall_debug ignore_loglevel"
 # CONFIG_XIP_KERNEL is not set
 CONFIG_KEXEC=y
 CONFIG_ATAGS_PROC=y

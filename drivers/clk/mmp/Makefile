@@ -14,9 +14,10 @@ obj-$(CONFIG_CPU_PXA1986) += clk-pxa1986.o clk-disp.o
 
 ifeq ($(CONFIG_PXA_DVFS), y)
 obj-y += dvfs.o
-obj-$(CONFIG_CPU_PXA988) += dvfs-dvc.o dvfs-pxa988.o dvfs-pxa1088.o dvfs-pxa1L88.o dvfs-pxa1u88.o
+obj-$(CONFIG_CPU_PXA988) += dvfs-dvc.o dvfs-pxa1088.o dvfs-pxa1L88.o dvfs-pxa1u88.o
 obj-$(CONFIG_CPU_EDEN) += dvfs-pxa1928.o
 endif
 
 obj-$(CONFIG_PXA_DVFS) += dvfs.o
 obj-$(CONFIG_DEBUG_FS) += clk-dcstat.o
+obj-$(CONFIG_GOYA_DVFS)	+= dvfs-pxa988.o
